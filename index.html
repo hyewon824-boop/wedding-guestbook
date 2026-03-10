@@ -7,106 +7,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Noto+Serif+KR:wght@200;300&family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: 'Noto Serif KR', serif;
-    background: #FAFAFA;
-    color: #3a3530;
-    padding: 48px 24px;
-    max-width: 520px;
-    margin: 0 auto;
-  }
-  .title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 9px;
-    letter-spacing: 6px;
-    text-transform: uppercase;
-    color: #c4b9ac;
-    text-align: center;
-    margin-bottom: 40px;
-  }
+  body { font-family:'Noto Serif KR',serif; background:#FAFAFA; color:#3a3530; padding:48px 24px; max-width:520px; margin:0 auto; }
+  .title { font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:6px; text-transform:uppercase; color:#c4b9ac; text-align:center; margin-bottom:40px; }
   .form { display:flex; flex-direction:column; gap:10px; margin-bottom:36px; }
-  input, textarea {
-    background: #f5f2ee;
-    border: 1px solid #e8e2da;
-    padding: 14px 16px;
-    font-family: 'Noto Serif KR', serif;
-    font-size: 13px;
-    font-weight: 300;
-    color: #3a3530;
-    outline: none;
-    width: 100%;
-    transition: border-color 0.2s;
-  }
-  input:focus, textarea:focus { border-color: #8B7355; }
-  textarea { height: 110px; resize: none; }
-  button {
-    background: #1c1814;
-    color: #fafafa;
-    border: none;
-    padding: 16px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 9px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s;
-    width: 100%;
-  }
-  button:hover { background: #8B7355; }
-  button:disabled { background: #c4b9ac; cursor: not-allowed; }
-  .msg-card {
-    background: #f5f2ee;
-    border: 1px solid #e8e2da;
-    padding: 20px;
-    margin-bottom: 10px;
-    animation: fadeIn 0.4s ease;
-  }
-  .msg-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .msg-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    font-weight: 300;
-    color: #1c1814;
-  }
-  .msg-date {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: #c4b9ac;
-  }
-  .msg-text { font-size: 13px; line-height: 1.9; color: #3a3530; }
-  .empty {
-    text-align: center;
-    color: #c4b9ac;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px;
-    letter-spacing: 3px;
-    padding: 40px 0;
-  }
-  @keyframes fadeIn {
-    from { opacity:0; transform: translateY(10px); }
-    to   { opacity:1; transform: translateY(0); }
-  }
+  input, textarea { background:#f5f2ee; border:1px solid #e8e2da; padding:14px 16px; font-family:'Noto Serif KR',serif; font-size:13px; font-weight:300; color:#3a3530; outline:none; width:100%; transition:border-color 0.2s; }
+  input:focus, textarea:focus { border-color:#8B7355; }
+  textarea { height:110px; resize:none; }
+  button { background:#1c1814; color:#fafafa; border:none; padding:16px; font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:4px; text-transform:uppercase; cursor:pointer; transition:background 0.2s; width:100%; }
+  button:hover { background:#8B7355; }
+  button:disabled { background:#c4b9ac; cursor:not-allowed; }
+  .msg-card { background:#f5f2ee; border:1px solid #e8e2da; padding:20px; margin-bottom:10px; }
+  .msg-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .msg-name { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:300; color:#1c1814; }
+  .msg-date { font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:2px; color:#c4b9ac; }
+  .msg-text { font-size:13px; line-height:1.9; color:#3a3530; }
+  .empty { text-align:center; color:#c4b9ac; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:3px; padding:40px 0; }
 </style>
 </head>
 <body>
-
 <p class="title">Guestbook &nbsp;·&nbsp; 방명록</p>
-
 <div class="form">
   <input id="gb-name" type="text" maxlength="20" placeholder="이름">
   <textarea id="gb-msg" maxlength="300" placeholder="축하 메시지를 남겨주세요 🤍"></textarea>
   <button id="gb-btn">메시지 남기기</button>
 </div>
+<div id="gb-list"><p class="empty">불러오는 중...</p></div>
 
-<div id="gb-list"></div>
-
-<!-- Firebase compat (가장 호환성 좋은 방식) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
@@ -118,42 +44,29 @@
     messagingSenderId: "877892214945",
     appId: "1:877892214945:web:be9e47346047d6b207d0e0"
   });
-
   var db = firebase.firestore();
 
-  function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   function gbLoad() {
     var list = document.getElementById('gb-list');
-    list.innerHTML = '<p class="empty">불러오는 중...</p>';
-    db.collection('guestbook')
-      .orderBy('timestamp', 'desc')
-      .get()
+    db.collection('guestbook').orderBy('timestamp','desc').get()
       .then(function(snap) {
         list.innerHTML = '';
-        if (snap.empty) {
-          list.innerHTML = '<p class="empty">첫 번째 메시지를 남겨주세요 🤍</p>';
-          return;
-        }
+        if (snap.empty) { list.innerHTML = '<p class="empty">첫 번째 메시지를 남겨주세요 🤍</p>'; return; }
         snap.forEach(function(doc) {
           var d = doc.data();
-          var date = d.timestamp ? d.timestamp.toDate().toLocaleDateString('ko-KR') : '';
+          var date = '';
+          try { date = d.timestamp.toDate().toLocaleDateString('ko-KR'); } catch(e) {}
           var card = document.createElement('div');
           card.className = 'msg-card';
-          card.innerHTML =
-            '<div class="msg-header">' +
-              '<span class="msg-name">' + escapeHtml(d.name) + '</span>' +
-              '<span class="msg-date">' + date + '</span>' +
-            '</div>' +
-            '<p class="msg-text">' + escapeHtml(d.message).replace(/\n/g,'<br>') + '</p>';
+          card.innerHTML = '<div class="msg-header"><span class="msg-name">'+esc(d.name)+'</span><span class="msg-date">'+date+'</span></div><p class="msg-text">'+esc(d.message).replace(/\n/g,'<br>')+'</p>';
           list.appendChild(card);
         });
       })
-      .catch(function() {
-        list.innerHTML = '<p class="empty">메시지를 불러올 수 없어요 😢</p>';
-      });
+      .catch(function(err) { list.innerHTML = '<p class="empty">잠시 후 다시 시도해 주세요 😢</p>'; console.error(err); });
   }
 
   document.getElementById('gb-btn').addEventListener('click', function() {
@@ -162,23 +75,18 @@
     if (!name) { alert('이름을 입력해 주세요!'); return; }
     if (!msg)  { alert('메시지를 입력해 주세요!'); return; }
     var btn = document.getElementById('gb-btn');
-    btn.disabled = true;
-    btn.textContent = '전송 중...';
+    btn.disabled = true; btn.textContent = '전송 중...';
     db.collection('guestbook').add({
-      name: name,
-      message: msg,
+      name: name, message: msg,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(function() {
       document.getElementById('gb-name').value = '';
       document.getElementById('gb-msg').value = '';
-      btn.disabled = false;
-      btn.textContent = '메시지 남기기';
+      btn.disabled = false; btn.textContent = '메시지 남기기';
       gbLoad();
     }).catch(function(err) {
-      console.error(err);
-      alert('저장 중 오류가 났어요. 잠시 후 다시 시도해 주세요.');
-      btn.disabled = false;
-      btn.textContent = '메시지 남기기';
+      alert('오류가 발생했어요: ' + err.message);
+      btn.disabled = false; btn.textContent = '메시지 남기기';
     });
   });
 
